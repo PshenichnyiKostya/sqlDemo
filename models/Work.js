@@ -1,31 +1,34 @@
-class Work {
+const Sequelize = require('sequelize')
 
-    constructor(id, name) {
-        this._id = id;
-        this._name = name;
-    }
+const Work = sequelize.define('work', {
 
-    get id() {
-        return this._id;
-    }
+    idWork: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        unique: true,
+    },
 
-    set id(value) {
-        this._id = value;
-    }
+    name: {
+        type: Sequelize.STRING(20),
+        allowNull: false,
+    },
 
-    get name() {
-        return this._name;
-    }
+}, {
+    indexes: [{
+        unique: true,
+        fields: ['name']
+    }]
+})
 
-    set name(value) {
-        this._name = value;
-    }
-
-    static GET_WORKER_BY_ID = "SElECT * FROM worker WHERE idWorker=?"
-    static GET_ALL_WORKERS = "SElECT * FROM worker"
-    static DELETE_WORKER_BY_ID = "DELETE FROM worker WHERE idWorker=?"
-    static POST_WORKER = "INSERT INTO worker (name, surname) VALUES (?,?)"
-    static UPDATE_WORKER_BY_ID = "UPDATE worker SET name=?, surname=? WHERE idWorker=?"
+Work.associate = (models) => {
+    Work.belongsToMany(models.Worker, {
+        through: 'worker_work',
+        as: 'workers',
+        foreignKey: 'idWork'
+    })
 }
+
 
 module.exports = Work

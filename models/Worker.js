@@ -1,40 +1,32 @@
-class Worker {
+const Sequelize = require('sequelize')
 
-    get id() {
-        return this._id;
-    }
 
-    set id(value) {
-        this._id = value;
-    }
+const Worker = sequelize.define('worker', {
 
-    get name() {
-        return this._name;
-    }
+    idWorker: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+    },
 
-    set name(value) {
-        this._name = value;
-    }
+    name: {
+        type: Sequelize.STRING(10),
+        allowNull: false,
+    },
 
-    constructor(id, name, surname) {
-        this._id = id;
-        this._name = name;
-        this._surname = surname;
-    }
+    surname: {
+        type: Sequelize.STRING(20),
+        allowNull: false,
+    },
+})
 
-    get surname() {
-        return this._surname;
-    }
-
-    set surname(value) {
-        this._surname = value;
-    }
-
-    static GET_WORKER_BY_ID = "SElECT * FROM worker WHERE idWorker=?"
-    static GET_ALL_WORKERS = "SElECT * FROM worker"
-    static DELETE_WORKER_BY_ID = "DELETE FROM worker WHERE idWorker=?"
-    static POST_WORKER = "INSERT INTO worker (name, surname) VALUES (?,?)"
-    static UPDATE_WORKER_BY_ID = "UPDATE worker SET name=?, surname=? WHERE idWorker=?"
+Worker.associate = (models) => {
+    Worker.belongsToMany(models.Work, {
+        through: 'worker_work',
+        as: 'works',
+        foreignKey: 'idWorker'
+    })
 }
 
 module.exports = Worker
