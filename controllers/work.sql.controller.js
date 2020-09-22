@@ -1,8 +1,9 @@
 const {QueryTypes} = require('sequelize')
+const db = require('../databaseConnection')
 module.exports = {
     getWorks: async (req, res, next) => {
         try {
-            const works = await sequelize.query("SElECT * FROM work", {
+            const works = await db.query("SElECT * FROM work", {
                 type: QueryTypes.SELECT,
             })
             res.status(200).json({data: works})
@@ -13,7 +14,7 @@ module.exports = {
     },
     getWork: async (req, res, next) => {
         try {
-            const work = await sequelize.query("SElECT * FROM work WHERE idWork=:id", {
+            const work = await db.query("SElECT * FROM work WHERE idWork=:id", {
                 replacements: {id: req.params.id},
                 type: QueryTypes.SELECT,
             })
@@ -25,7 +26,12 @@ module.exports = {
     },
     deleteWork: async (req, res, next) => {
         try {
-            await sequelize.query("DELETE FROM work WHERE idWork=:id", {
+
+            await db.query("DELETE FROM worker_work WHERE (`idWork` = :idWork);", {
+                replacements: {idWork: req.params.id},
+                type: QueryTypes.DELETE,
+            })
+            await db.query("DELETE FROM work WHERE idWork=:id", {
                 replacements: {id: req.params.id},
                 type: QueryTypes.DELETE,
             })
@@ -41,7 +47,7 @@ module.exports = {
             if (!name) {
                 return res.status(400).json({error: "Enter all parameters"})
             }
-            const work = await sequelize.query("INSERT INTO work (name) VALUES(:name)", {
+            const work = await db.query("INSERT INTO work (name) VALUES(:name)", {
                 replacements: {name},
                 type: QueryTypes.INSERT,
             })
@@ -58,7 +64,7 @@ module.exports = {
             if (!name) {
                 return res.status(400).json({error: "Enter all parameters"})
             }
-            const work = await sequelize.query("UPDATE work SET name=:name WHERE idWork=:id", {
+            const work = await db.query("UPDATE work SET name=:name WHERE idWork=:id", {
                 replacements: {name, id: req.params.id},
                 type: QueryTypes.UPDATE,
             })
@@ -79,7 +85,7 @@ module.exports = {
             if (!idWork) {
                 return res.status(400).json({error: "Enter all parameters"})
             }
-            await sequelize.query("DELETE FROM worker_work WHERE (`idWorker` = :idWorker) and (`idWork` = :idWork);", {
+            await db.query("DELETE FROM worker_work WHERE (`idWorker` = :idWorker) and (`idWork` = :idWork);", {
                 replacements: {idWorker: req.params.idWorker, idWork},
                 type: QueryTypes.DELETE,
             })
@@ -94,12 +100,12 @@ module.exports = {
             if (!idWork) {
                 return res.status(400).json({error: "Enter all parameters"})
             }
-            const jobs = await sequelize.query("SElECT startWork,salary FROM worker_work WHERE idWork=:idWork", {
+            const jobs = await db.query("SElECT startWork,salary FROM worker_work WHERE idWork=:idWork", {
                 replacements: {idWork},
                 type: QueryTypes.SELECT,
             })
             const monthSalary = jobs.reduce((prev, cur) => prev + cur.salary, 0)
-            res.status(200).json({data: jobs, monthSalary})
+            res.status(200).json({data: {jobs, monthSalary}})
         } catch (e) {
             next(e)
         }

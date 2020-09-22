@@ -7,5 +7,3 @@ const sequelize = new Sequelize(db?.database, db?.user, db?.password, {
 });
 
 module.exports = sequelize
-
-global.sequelize = sequelize

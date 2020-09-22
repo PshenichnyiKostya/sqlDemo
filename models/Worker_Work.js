@@ -1,13 +1,9 @@
 const Sequelize = require('sequelize')
+const db = require('../databaseConnection')
+const Work = require('../models/Work')
+const Worker = require('../models/Worker')
 
-module.exports = sequelize.define('worker-work', {
-
-    // id: {
-    //     type: Sequelize.INTEGER,
-    //     allowNull: false,
-    //     autoIncrement: true,
-    //     primaryKey: true,
-    // },
+const Worker_Work = db.define('worker_work', {
 
     idWorker: {
         type: Sequelize.INTEGER,
@@ -39,4 +35,23 @@ module.exports = sequelize.define('worker-work', {
         type: Sequelize.DOUBLE,
         allowNull: false,
     }
+}, {
+    freezeTableName: true,
+    timestamps: false
 })
+
+
+// Worker.belongsToMany(Work, {
+//     through: 'worker_work',
+//     // as: 'works',
+//     foreignKey: 'idWorker'
+// })
+// Work.belongsToMany(Worker, {
+//     through: 'worker_work',
+//     // as: 'workers',
+//     foreignKey: 'idWork'
+// })
+
+Worker_Work.hasMany(Work, {foreignKey: 'idWork', sourceKey: 'idWork'})
+Worker_Work.hasMany(Worker, {foreignKey: 'idWorker', sourceKey: 'idWorker'})
+module.exports = Worker_Work

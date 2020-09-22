@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize')
-
-const Work = sequelize.define('work', {
+const db = require('../databaseConnection')
+const Work = db.define('work', {
 
     idWork: {
         type: Sequelize.INTEGER,
@@ -19,16 +19,11 @@ const Work = sequelize.define('work', {
     indexes: [{
         unique: true,
         fields: ['name']
-    }]
+    }],
+    freezeTableName: true,
+    timestamps: false
 })
 
-Work.associate = (models) => {
-    Work.belongsToMany(models.Worker, {
-        through: 'worker_work',
-        as: 'workers',
-        foreignKey: 'idWork'
-    })
-}
 
 
 module.exports = Work
