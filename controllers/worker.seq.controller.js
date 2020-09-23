@@ -4,7 +4,12 @@ const Worker_Work = require('../models/Worker_Work')
 module.exports = {
     getWorkers: async (req, res, next) => {
         try {
-            const workers = await Worker.findAll()
+            const DEFAULT_LIMIT = 10000
+            let limit = req.query.limit
+            if (Number.isNaN(Number(limit))) {
+                limit = DEFAULT_LIMIT
+            }
+            const workers = await Worker.findAll({limit: Number(limit)})
             res.status(200).json({data: workers})
         } catch (e) {
             next(e)
@@ -125,22 +130,23 @@ module.exports = {
             if (!idWorker) {
                 return res.status(400).json({error: "Enter all parameters"})
             }
-            // db.query("SElECT startWork,salary,work.name FROM worker_work INNER JOIN work ON work.idWork=worker_work.idWork WHERE idWorker=:idWorker", {
-            //     replacements: {idWorker},
-            //     type: QueryTypes.SELECT,
-            // })
+
             const jobs = await Worker_Work.findAll({
-                where: {idWorker}, include: [{
+                where: {idWorker}, attributes: ['idWork', 'salary', 'startWork'],
+                include:[{
                     model: Work,
-                    attributes: ['name'],
-                    required: true
-                }], attributes: ['idWork', 'salary', 'startWork'],
+                    attributes:['name']
+                }]
             })
+            // let jobsFullInfo = []
+            // for (let i = 0; i < jobs.length; i++) {
+            //     let work = await Work.findByPk(jobs[i].idWork)
+            //     jobsFullInfo.push({salary: jobs[i].salary, startWork: jobs[i].startWork, workName: work.name})
+            // }
             const monthSalary = jobs.reduce((prev, cur) => prev + cur.salary, 0)
             res.status(200).json({data: {jobs, monthSalary}})
         } catch (e) {
             next(e)
         }
     }
-
 }

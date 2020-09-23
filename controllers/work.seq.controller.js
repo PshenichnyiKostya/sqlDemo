@@ -4,7 +4,12 @@ const Worker_Work = require('../models/Worker_Work')
 module.exports = {
     getWorks: async (req, res, next) => {
         try {
-            const works = await Work.findAll()
+            const DEFAULT_LIMIT = 100
+            let limit = req.query.limit
+            if (Number.isNaN(Number(limit))) {
+                limit = DEFAULT_LIMIT
+            }
+            const works = await Work.findAll({limit: Number(limit)})
             res.status(200).json({data: works})
         } catch (e) {
             next(e)

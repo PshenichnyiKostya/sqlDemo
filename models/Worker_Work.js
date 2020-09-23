@@ -41,17 +41,6 @@ const Worker_Work = db.define('worker_work', {
 })
 
 
-// Worker.belongsToMany(Work, {
-//     through: 'worker_work',
-//     // as: 'works',
-//     foreignKey: 'idWorker'
-// })
-// Work.belongsToMany(Worker, {
-//     through: 'worker_work',
-//     // as: 'workers',
-//     foreignKey: 'idWork'
-// })
-
 Worker_Work.hasMany(Work, {foreignKey: 'idWork', sourceKey: 'idWork'})
 Worker_Work.hasMany(Worker, {foreignKey: 'idWorker', sourceKey: 'idWorker'})
 module.exports = Worker_Work

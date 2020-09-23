@@ -3,7 +3,12 @@ const db = require('../databaseConnection')
 module.exports = {
     getWorks: async (req, res, next) => {
         try {
-            const works = await db.query("SElECT * FROM work", {
+            const DEFAULT_LIMIT = 100
+            let limit = req.query.limit
+            if (Number.isNaN(Number(limit))) {
+                limit = DEFAULT_LIMIT
+            }
+            const works = await db.query(`SElECT * FROM work LIMIT ${limit}`, {
                 type: QueryTypes.SELECT,
             })
             res.status(200).json({data: works})
